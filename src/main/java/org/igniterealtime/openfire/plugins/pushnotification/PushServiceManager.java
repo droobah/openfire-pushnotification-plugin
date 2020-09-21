@@ -44,6 +44,12 @@ public class PushServiceManager
         try
         {
             connection = DbConnectionManager.getConnection();
+            //remove all old entries related to the node being passed
+            pstmt = connection.prepareStatement( "DELETE FROM ofPushNotiService where node = ? " );
+            pstmt.setString( 1, node );
+            pstmt.execute();
+
+            //insert current entry
             pstmt = connection.prepareStatement( "INSERT INTO ofPushNotiService (username, service, node, options) VALUES(?,?,?,?) " );
             pstmt.setString( 1, user.getUsername() );
             pstmt.setString( 2, pushService.toString() );
