@@ -117,6 +117,21 @@ public class PushInterceptor implements PacketInterceptor, OfflineMessageListene
             return;
         }
 
+        String[] allowedDomains = JiveGlobals.getProperty("pushnotifications.alloweddomains", "").split(",");
+        if (allowedDomains.length > 1 || !allowedDomains[0].isEmpty()) {
+            Boolean domainMatch = false;
+            for (String domain : allowedDomains) {
+                if (packet.getFrom().getDomain().equalsIgnoreCase(domain)) {
+                    domainMatch = true;
+                    break;
+                }
+            }
+            if (!domainMatch) {
+                Log.debug( "Not a whitelisted domain: " + packet.getFrom().toString() );
+                return;
+            }
+        }
+
         Log.trace( "If user '{}' has push services configured, pushes need to be sent for a message that just arrived.", user );
         tryPushNotification( user, (Message) packet );
     }
